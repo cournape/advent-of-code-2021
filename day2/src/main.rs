@@ -73,29 +73,6 @@ fn main() {
     }
 }
 
-fn parse_line(line: &String) -> Result<Instruction, &'static str> {
-    let parts = line.split_whitespace();
-    let parts: Vec<&str> = parts.collect();
-
-    match parts.len() {
-        2 => {
-            let name = &parts[0];
-            let value: i32 = parts[1].parse().unwrap();
-
-            let instruction = match name {
-                &"up" => Instruction::Up(value),
-                &"down" => Instruction::Down(value),
-                &"forward" => Instruction::Forward(value),
-                _ => {
-                    return Err("Unrecognized opcode");
-                }
-            };
-            return Ok(instruction);
-        },
-        _ => Err("Could not parse line"),
-    }
-}
-
 fn parse_entries(filename: &String) -> Result<Vec::<Instruction>, &'static str> {
     let file = File::open(filename).expect("Could not open file");
     let buf = io::BufReader::new(file);
@@ -103,8 +80,30 @@ fn parse_entries(filename: &String) -> Result<Vec::<Instruction>, &'static str> 
     let mut entries = Vec::<Instruction>::new();
     for line in buf.lines() {
         let line = line.unwrap();
-        entries.push(parse_line(&line).unwrap());
 
+        let parts = line.split_whitespace();
+        let parts: Vec<&str> = parts.collect();
+
+        let instruction = match parts.len() {
+            2 => {
+                let name = &parts[0];
+                let value: i32 = parts[1].parse().unwrap();
+
+                match name {
+                    &"up" => Instruction::Up(value),
+                    &"down" => Instruction::Down(value),
+                    &"forward" => Instruction::Forward(value),
+                    _ => {
+                        return Err("Unrecognized opcode");
+                    }
+                }
+            },
+            _ => {
+                return Err("Could not parse line");
+            }
+        };
+
+        entries.push(instruction);
     }
 
     Ok(entries)

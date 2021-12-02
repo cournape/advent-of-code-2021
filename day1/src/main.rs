@@ -25,12 +25,13 @@ fn main() {
             println!("{} increases", n_increases);
         },
         1 | _ => {
-            panic!("Not implemented");
+            let n_increases = solve_secondary_problem(&filename).unwrap();
+            println!("{} increases", n_increases);
         }
     }
 }
 
-fn solve_main_problem(filename: &String) -> Result<usize, &'static str> {
+fn parse_entries(filename: &String) -> Result<Vec::<i32>, &'static str> {
     let file = File::open(filename).expect("Could not open file");
     let buf = io::BufReader::new(file);
 
@@ -42,6 +43,10 @@ fn solve_main_problem(filename: &String) -> Result<usize, &'static str> {
         entries.push(entry);
     }
 
+    Ok(entries)
+}
+
+fn find_n_increases(entries: Vec<i32>) -> Result<usize, &'static str> {
     let mut acc: usize = 0;
     if entries.len() >= 1 {
         for i in 1..entries.len() {
@@ -53,4 +58,25 @@ fn solve_main_problem(filename: &String) -> Result<usize, &'static str> {
     }
 
     Ok(acc)
+}
+
+fn solve_main_problem(filename: &String) -> Result<usize, &'static str> {
+    let entries = parse_entries(filename).unwrap();
+    Ok(find_n_increases(entries).unwrap())
+}
+
+
+fn solve_secondary_problem(filename: &String) -> Result<usize, &'static str> {
+    let entries = parse_entries(filename).unwrap();
+
+    let mut windows = Vec::<i32>::new();
+
+    if entries.len() >= 3 {
+        for i in 1..(entries.len() - 1) {
+            let window: i32 = entries[i+1] + entries[i] + entries[i-1];
+            windows.push(window);
+        }
+    }
+
+    Ok(find_n_increases(windows).unwrap())
 }

@@ -48,7 +48,27 @@ fn main() {
             println!("Pos {}, Depth {} -> {}", pos, depth, pos * depth);
         },
         1 | _ => {
-            panic!("not implemented");
+            let entries = parse_entries(&filename).unwrap();
+
+            let mut pos: i32 = 0;
+            let mut depth: i32 = 0;
+            let mut aim: i32 = 0;
+
+            for entry in entries {
+                match entry {
+                    Instruction::Forward(value) => {
+                        pos += value;
+                        depth += aim * value;
+                    },
+                    Instruction::Up(value) => {
+                        aim -= value;
+                    }
+                    Instruction::Down(value) => {
+                        aim += value;
+                    }
+                }
+            }
+            println!("Pos {}, Depth {} -> {}", pos, depth, pos * depth);
         }
     }
 }
